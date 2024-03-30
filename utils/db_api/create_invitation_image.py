@@ -4,8 +4,10 @@ import datetime
 
 from PIL import Image, ImageDraw, ImageFont
 
+from utils.db_api.transliterate import to_latin
 
-async def create_certificate(user_id, fullname, school, created_date=datetime.datetime.now().date()):
+
+async def create_certificate(user_id, fullname: str, school, created_date=datetime.datetime.now().date()):
     img = Image.open(f'data/images/invitation.jpg')
 
     draw = ImageDraw.Draw(img)
@@ -16,6 +18,8 @@ async def create_certificate(user_id, fullname, school, created_date=datetime.da
     font2 = ImageFont.truetype(font_path2, 100)
 
     text_color = (255, 255, 255)
+    if not fullname.isascii():
+        fullname = to_latin(fullname)
 
     text_bbox = draw.textbbox((1150, 2300), fullname, font=font1)
     text_width = text_bbox[2] - text_bbox[0]
