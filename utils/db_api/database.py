@@ -92,7 +92,7 @@ class Database:
     async def get_lid_invitation_image(self, tg_id):
         conn = await self.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT invitation FROM lids WHERE tg_id = ?", [tg_id])
+        cursor.execute("SELECT invitation, fullname FROM lids WHERE tg_id = ?", [tg_id])
         lid = cursor.fetchone()
         conn.close()
         return lid

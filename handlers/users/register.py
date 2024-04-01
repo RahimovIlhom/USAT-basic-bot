@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 from aiogram import types
@@ -71,15 +72,16 @@ async def contact_input(msg: types.Message, state: FSMContext) -> None:
 
 @dp.message_handler(text="📥 Taklifnomani yuklab olish")
 async def contact_input(msg: types.Message, state: FSMContext) -> None:
-    invitation_image = await db.get_lid_invitation_image(msg.from_user.id)
-    info = ("⚡️ Hurmatli Palonchi Pistonchi! Bizni sizga yana bitta taklifimiz bor.\n\nUniversitetda grant asosida "
+    invitation_image_fullname = await db.get_lid_invitation_image(msg.from_user.id)
+    info = ("⚡️ Hurmatli {}! Bizni sizga yana bitta taklifimiz bor.\n\nUniversitetda grant asosida "
             "bepul ta’lim olishni yoki 15 million so’mgacha vaucher yutib olishni xohlaysizmi? O’zingizni test "
             "sinovlarida sinab ko’rmoqchimisiz? Unda “Fan javohirlari” olimpiadasi aynan siz uchun! "
             "\n\n@FanJavohirlaribot telegram-botida ro’yxatdan o’ting, imtihonda ishtirok eting va grant, "
             "vaucher hamda boshqa qimmatbaho sovg’alarni yutib olish imkoniyatini qo’lga kiriting!\n\n✅ Olimpiadaga "
             "ro’yxatdan o’tish 👉 @FanJavohirlaribot\n\n✅ “Fan javohirlari” kanali 👉 @FanJavohirlari")
-    if invitation_image:
-        await msg.answer_photo(invitation_image[0], caption="Sizning taklifnomangiz")
+    if invitation_image_fullname:
+        await msg.answer_photo(invitation_image_fullname[0], caption="Sizning taklifnomangiz")
+        await asyncio.sleep(3)
+        await msg.answer(info.format(invitation_image_fullname[1]))
     else:
         await msg.answer("Taklifnoma topilmadi! Qayta urinib ko'ring.")
-    await msg.answer(info)
