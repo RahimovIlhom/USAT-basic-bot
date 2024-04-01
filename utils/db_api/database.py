@@ -95,4 +95,4 @@ class Database:
         cursor.execute("SELECT invitation FROM lids WHERE tg_id = ?", [tg_id])
         lid = cursor.fetchone()
         conn.close()
-        return lid[0]
+        return lid

@@ -49,11 +49,13 @@ async def contact_input(msg: types.Message, state: FSMContext) -> None:
 async def contact_input(msg: types.Message, state: FSMContext) -> None:
     try:
         await state.update_data({'pinfl': msg.text})
+        data = await state.get_data()
+        await state.reset_data()
+        await state.finish()
         info = ("Tabriklaymiz, siz ro'yxatdan muvaffaqiyatli o'tdingiz! Universitetga borganda taklifnomani "
                 "ko'rsatishingiz kifoya.\n\n"
                 "Taklifnomani quyidagi tugma orqali yuklab olishingiz mumkin! 👇")
         await msg.answer(info, reply_markup=invitation_button)
-        data = await state.get_data()
         invitation_image_path = await create_certificate(msg.from_user.id, data.get('fullname'), data.get('school'))
         invitation_image_url = await photo_link(invitation_image_path)
         data.update({'invitation': invitation_image_url, 'tg_id': msg.from_user.id})
@@ -65,14 +67,19 @@ async def contact_input(msg: types.Message, state: FSMContext) -> None:
             os.remove(invitation_image_path)
         except Exception as e:
             print(f"Failed to delete image file: {e}")
-        await state.reset_data()
-        await state.finish()
 
 
 @dp.message_handler(text="📥 Taklifnomani yuklab olish")
 async def contact_input(msg: types.Message, state: FSMContext) -> None:
     invitation_image = await db.get_lid_invitation_image(msg.from_user.id)
+    info = ("⚡️ Hurmatli Palonchi Pistonchi! Bizni sizga yana bitta taklifimiz bor.\n\nUniversitetda grant asosida "
+            "bepul ta’lim olishni yoki 15 million so’mgacha vaucher yutib olishni xohlaysizmi? O’zingizni test "
+            "sinovlarida sinab ko’rmoqchimisiz? Unda “Fan javohirlari” olimpiadasi aynan siz uchun! "
+            "\n\n@FanJavohirlaribot telegram-botida ro’yxatdan o’ting, imtihonda ishtirok eting va grant, "
+            "vaucher hamda boshqa qimmatbaho sovg’alarni yutib olish imkoniyatini qo’lga kiriting!\n\n✅ Olimpiadaga "
+            "ro’yxatdan o’tish 👉 @FanJavohirlaribot\n\n✅ “Fan javohirlari” kanali 👉 @FanJavohirlari")
     if invitation_image:
-        await msg.answer_photo(invitation_image)
+        await msg.answer_photo(invitation_image[0], caption="Sizning taklifnomangiz")
     else:
-        await msg.answer("Taklifnoma topilmadi!")
+        await msg.answer("Taklifnoma topilmadi! Qayta urinib ko'ring.")
+    await msg.answer(info)
